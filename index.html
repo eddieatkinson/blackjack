@@ -11,5 +11,66 @@
 </head>
 <body>
 
+	<!-- Layout...
+	1. Create an element for our table
+	2. Make it green
+	3. Give it a border (white)
+	4. Create an element for the dealer's hand and player's hand
+	5. Create an element for the dealer's total and the player's total
+	6. Create an element inside each hand for each card (max of 6)
+	7. Make a deal, hit, and stand button -->
+
+	<div class="container">
+		<div class="row">
+			<div class="col-12-sm the-table">
+				<div class="row">
+					<div class="col-sm-12 dealer-hand-wrapper">
+						<div class="col-sm-2 dealer-total">
+							Dealer total: 0
+						</div>
+						<div class="col-sm-10 dealer-cards">
+							<!-- This is 10 columns of dealer-hand-wrapper.
+							We will divide the 10 columns into 6, 1 2
+							column width space for each card. -->
+							<div class="card card-1 col-sm-2">-</div>
+							<div class="card card-2 col-sm-2">-</div>
+							<div class="card card-3 col-sm-2">-</div>
+							<div class="card card-4 col-sm-2">-</div>
+							<div class="card card-5 col-sm-2">-</div>
+							<div class="card card-6 col-sm-2">-</div>
+						</div>
+					</div>
+					<div class="col-sm-12 player-hand-wrapper">
+						<div class="col-sm-2 player-total">
+							Player total: 0
+						</div>
+						<div class="col-sm-10 player-cards">
+							<div class="card card-1 col-sm-2">-</div>
+							<div class="card card-2 col-sm-2">-</div>
+							<div class="card card-3 col-sm-2">-</div>
+							<div class="card card-4 col-sm-2">-</div>
+							<div class="card card-5 col-sm-2">-</div>
+							<div class="card card-6 col-sm-2">-</div>
+						</div>
+					</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-2 col-sm-offset-3">
+						<button class="btn btn-primary deal-button">Deal</button>
+					</div>
+					<div class="col-sm-2 col-sm-offset-2">
+						<button class="btn btn-danger hit-button">Hit</button>
+					</div>
+					<div class="col-sm-2 col-sm-offset-1">
+						<button class="btn btn-warning stand-button">Stand</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+	</div>
+
 </body>
 </html>
