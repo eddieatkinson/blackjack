@@ -19,6 +19,8 @@ $(document).ready(()=>{
 	$('.deal-button').click(()=>{
 		theDeck = freshDeck.slice();
 		theDeck = shuffleDeck(theDeck);
+		playersHand = [];
+		dealersHand = [];
 		console.log(theDeck);
 		// Update the player and dealer hand arrays...
 		// The player ALWAYS gets the first card in the deck.
@@ -38,15 +40,21 @@ $(document).ready(()=>{
 		console.log(dealersHand);
 		console.log(theDeck);
 
+		// Call placeCard for each of the 4 cards:
+		// arg 1. who
+		// arg 2. where
+		// arg 3. what (card to place in the DOM)
 		placeCard('player', 1, playersHand[0]);
 		placeCard('dealer', 1, dealersHand[0]);
 		placeCard('player', 2, playersHand[1]);
 		placeCard('dealer', 2, dealersHand[1]);
 
-		// if(gameStart){
-		// 	dealCards();
-		// 	gameStart = false;
-		// }
+		// Figure the total and put it in the DOM.
+		// arg 1. entire hand
+		// arg 2. who
+
+		calculateTotal(playersHand, 'player');
+		calculateTotal(dealersHand, 'dealer');
 	})
 
 	$('.hit-button').click(()=>{
@@ -59,6 +67,25 @@ $(document).ready(()=>{
 	$('.stand-button').click(()=>{
 		
 	})
+
+	function calculateTotal(hand, who){
+		// purpose:
+		// 1. Find out the number and return it.
+		// 2. Update the DOM with the right number for the right player.
+		// Initialize counter at 0.
+		var handTotal = 0;
+		// As we loop through the hand, we need a var for each card's value.
+		var thisCardsValue = 0;
+		for(let i = 0; i < hand.length; i++){
+			// Copy onto thisCardsValue the entire sting, except for the last character (-1).
+			// Then, convert it to a number.
+			thisCardsValue = Number(hand[i].slice(0,-1));
+			handTotal += thisCardsValue;
+		}
+		var classSelector = `.${who}-total`;
+		$(classSelector).html(handTotal);
+		return handTotal;
+	}
 
 	function placeCard(who, where, whatToPlace){
 		var classSelector = `.${who}-cards .card-${where}`;
