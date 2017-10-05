@@ -5,9 +5,10 @@ $(document).ready(()=>{
 	// 	Add card[0] and card[2] to player hand, 1 and 3 to dealer
 	// 	Place card function
 	// 	Push card onto player's array
-
+	var gameStart = true
 	var playersHand = [];
 	var dealersHand = [];
+	var currentCardIndex = 0;
 	// freshDeck is the return value of the function createDeck()
 	const freshDeck = createDeck();
 	console.log(freshDeck);
@@ -51,7 +52,43 @@ $(document).ready(()=>{
 		console.log(theDeck);
 	}
 
+	function initDealCards(){
+		// let i = 0;
+		while(currentCardIndex < 4){
+			playersHand.push(theDeck[currentCardIndex]);
+			currentCardIndex++;
+			dealersHand.push(theDeck[currentCardIndex]);
+			currentCardIndex++
+		}
+		console.log(playersHand);
+		console.log(dealersHand);
+	}
+	// initDealCards()
 
+	$('.deal-button').click(()=>{
+		if(gameStart){
+			initDealCards();
+			gameStart = false;
+		}
+	})
+
+	$('.hit-button').click(()=>{
+		if(!gameStart){
+			console.log(currentCardIndex);
+			hitMe();
+		}
+	})
+
+	function hitMe(){
+		playersHand.push(theDeck[currentCardIndex]);
+		currentCardIndex++;
+		console.log("Hit me!" + currentCardIndex);
+		dealersHand.push(theDeck[currentCardIndex]);
+		currentCardIndex++;
+		console.log("Hit me dealer" + currentCardIndex);
+		console.log(playersHand);
+		console.log(dealersHand);
+	}
 
 
 
