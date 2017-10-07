@@ -6,6 +6,10 @@
 	padding: 30px 0px;
 }
 
+.message{
+	min-height: 40px;
+}
+
 .card{
 	height: 120px;
 	background-color: #FFF;

@@ -23,7 +23,7 @@ $(document).ready(()=>{
 		playersHand = [];
 		dealersHand = [];
 		$('.card').html('-');
-		console.log(theDeck);
+		// console.log(theDeck);
 		// Update the player and dealer hand arrays...
 		// The player ALWAYS gets the first card in the deck.
 		var topCard = theDeck.shift();
@@ -47,9 +47,9 @@ $(document).ready(()=>{
 		dealersHand.push(topCard);
 		placeCard('dealer', 2, dealersHand[1]);
 
-		console.log(playersHand);
-		console.log(dealersHand);
-		console.log(theDeck);
+		// console.log(playersHand);
+		// console.log(dealersHand);
+		// console.log(theDeck);
 
 		// Call placeCard for each of the 4 cards:
 		// arg 1. who
@@ -118,6 +118,12 @@ $(document).ready(()=>{
 		// 7. else...push (tie)
 	}
 
+	function placeCard(who, where, whatToPlace){
+		var classSelector = `.${who}-cards .card-${where}`;
+		$(classSelector).html(`<img src="images/cards/${whatToPlace}.png" />`);
+		// console.log("1");
+	}
+
 	function calculateTotal(hand, who){
 		// purpose:
 		// 1. Find out the number and return it.
@@ -130,12 +136,18 @@ $(document).ready(()=>{
 			// Copy onto thisCardsValue the entire sting, except for the last character (-1).
 			// Then, convert it to a number.
 			thisCardsValue = Number(hand[i].slice(0,-1));
-			if(thisCardsValue == 1){
-				thisCardsValue = prompt("Ooh. It looks like you got an ace. Would you like it to be 1 or 11 points?");
-			}
 			if(thisCardsValue > 10){
 				thisCardsValue = 10;
 			}
+			if(who == 'player' && thisCardsValue == 1){
+				var aceMessage = $('.message');
+				// thisCardsValue = Number(prompt("Ooh. It looks like you got an ace. Would you like it to be 1 or 11 points?"));
+				aceMessage.html(`<form class="ace-value-submit">Oooh. You got an ace! Would you like it to be valued 1 or 11?<input type="text" class="ace-value" 
+					placeholder="Type a 1 or 11" required><input type="submit" value="Make that ace happen!"></form>`);
+				thisCardsValue = aceValueSubmit();
+				
+			}
+			
 			// if(thisCardsValue == 1){
 			// 	thisCardsValue = valueOfAce;
 			// }
@@ -143,13 +155,26 @@ $(document).ready(()=>{
 		}
 		var classSelector = `.${who}-total`;
 		$(classSelector).html(handTotal);
+		// console.log("2");
 		return handTotal;
 	}
 
-	function placeCard(who, where, whatToPlace){
-		var classSelector = `.${who}-cards .card-${where}`;
-		$(classSelector).html(`<img src="images/cards/${whatToPlace}.png" />`);
+	function aceValueSubmit(){
+		$('.ace-value-submit').click((event)=>{
+			event.preventDefault();
+			var aceValue = Number($('.message').val());
+			if(aceValue == 1){
+				thisCardsValue = 1;
+			}else if(aceValue == 11){
+				thisCardsValue = 11;
+			}else{
+				console.log("Not a proper value...");
+			}
+			
+		})
+		return thisCardsValue;
 	}
+	
 
 	function createDeck(){
 		var newDeck = [];
@@ -183,8 +208,8 @@ $(document).ready(()=>{
 			dealersHand.push(theDeck[currentCardIndex]);
 			currentCardIndex++
 		}
-		console.log(playersHand);
-		console.log(dealersHand);
+		// console.log(playersHand);
+		// console.log(dealersHand);
 	}
 	
 
