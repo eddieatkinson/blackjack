@@ -5,13 +5,14 @@ $(document).ready(()=>{
 	// 	Add card[0] and card[2] to player hand, 1 and 3 to dealer
 	// 	Place card function
 	// 	Push card onto player's array
-	var gameStart = true
+	var gameStart = true;
+	var gameOn = true;
 	var playersHand = [];
 	var dealersHand = [];
 	var currentCardIndex = 0;
 	// freshDeck is the return value of the function createDeck()
 	const freshDeck = createDeck();
-	console.log(freshDeck);
+	// console.log(freshDeck);
 	// Make a FULL copy of the freshDeck with slice, don't point at it.
 	var theDeck = freshDeck.slice();
 	// shuffleDeck();
@@ -21,20 +22,30 @@ $(document).ready(()=>{
 		theDeck = shuffleDeck(theDeck);
 		playersHand = [];
 		dealersHand = [];
+		$('.card').html('-');
 		console.log(theDeck);
 		// Update the player and dealer hand arrays...
 		// The player ALWAYS gets the first card in the deck.
 		var topCard = theDeck.shift();
 		playersHand.push(topCard);
+
+		placeCard('player', 1, playersHand[0]);
+
+		// var aceValue = aceCheck(topCard);
 		// Give the dealer the next top card...
 		topCard = theDeck.shift();
 		dealersHand.push(topCard);
+		placeCard('dealer', 1, dealersHand[0]);
 
 		topCard = theDeck.shift();
 		playersHand.push(topCard);
 
+		placeCard('player', 2, playersHand[1]);
+		// aceValue = aceCheck(topCard);
+
 		topCard = theDeck.shift();
 		dealersHand.push(topCard);
+		placeCard('dealer', 2, dealersHand[1]);
 
 		console.log(playersHand);
 		console.log(dealersHand);
@@ -44,10 +55,9 @@ $(document).ready(()=>{
 		// arg 1. who
 		// arg 2. where
 		// arg 3. what (card to place in the DOM)
-		placeCard('player', 1, playersHand[0]);
-		placeCard('dealer', 1, dealersHand[0]);
-		placeCard('player', 2, playersHand[1]);
-		placeCard('dealer', 2, dealersHand[1]);
+		
+		
+		
 
 		// Figure the total and put it in the DOM.
 		// arg 1. entire hand
@@ -58,15 +68,55 @@ $(document).ready(()=>{
 	})
 
 	$('.hit-button').click(()=>{
-		if(!gameStart){
-			console.log(currentCardIndex);
-			hitMe();
-		}
+		// Get the top card.
+		var topCard = theDeck.shift();
+		// Push it onto the player's hand.
+		playersHand.push(topCard);
+		// Put the card in the DOM.
+		placeCard('player', playersHand.length, topCard);
+		// aceCheck(topCard);
+		// Calculate the new total.
+		calculateTotal(playersHand, 'player');
 	})
 
 	$('.stand-button').click(()=>{
-		
+		// What happens to the player's hand on stand? -- Nothing.
+		// Control passes to the dealer.
+		// Rules for the dealer:
+		// 1. If I have less than 17..., I MUST hit.
+		// 2. If I have 17 or more, I CANNOT hit (even if it means losing)
+		var dealersTotal = calculateTotal(dealersHand, 'dealer');
+		while(dealersTotal < 17){
+			var topCard = theDeck.shift();
+			dealersHand.push(topCard);
+			placeCard('dealer', dealersHand.length, topCard);
+			dealersTotal = calculateTotal(dealersHand, 'dealer');
+		}
+		checkWin();
+
 	})
+
+	// function aceCheck(theTopCard){
+	// 	console.log(theTopCard);
+	// 	console.log(Number(theTopCard.slice[0, -1]));
+	// 	if(theTopCard.slice[0, -1] == "1"){
+	// 		var aceValue = prompt("Oooh. It looks like you got an ace! Would you like that to be a 1 or 11?");
+	// 	}
+	// 	return aceValue;
+	// }
+
+	function checkWin(){
+		var playersTotal = calculateTotal(playersHand, 'player');
+		var dealersTotal = calculateTotal(dealersHand, 'dealer');
+
+		// 1. If the player has > 21, player busts and loses.
+		// 2. If the dealer has > 21, dealer busts and loses.
+		// 3. If playersHand.length == 2 AND playersTotal == 21...BlackJack
+		// 4. If dealerHand.length == 2 AND dealersTotal == 21...BlackJack
+		// 5. If player > dealer, player wins
+		// 6. If dealer > player, dealer wins
+		// 7. else...push (tie)
+	}
 
 	function calculateTotal(hand, who){
 		// purpose:
@@ -80,6 +130,15 @@ $(document).ready(()=>{
 			// Copy onto thisCardsValue the entire sting, except for the last character (-1).
 			// Then, convert it to a number.
 			thisCardsValue = Number(hand[i].slice(0,-1));
+			if(thisCardsValue == 1){
+				thisCardsValue = prompt("Ooh. It looks like you got an ace. Would you like it to be 1 or 11 points?");
+			}
+			if(thisCardsValue > 10){
+				thisCardsValue = 10;
+			}
+			// if(thisCardsValue == 1){
+			// 	thisCardsValue = valueOfAce;
+			// }
 			handTotal += thisCardsValue;
 		}
 		var classSelector = `.${who}-total`;
@@ -94,43 +153,30 @@ $(document).ready(()=>{
 
 	function createDeck(){
 		var newDeck = [];
-		// card = suite + value
-		// suits is a constant, it cannot be reassigned
 		const suits = ['h', 's', 'd', 'c'];
-		// outer loop for suit
 		for(let s = 0; s < suits.length; s++){ // or suits.map((s)=>{
 			//})
-		// 	 inner loop for value
 			for(let c = 1; c <= 13; c++){
 				newDeck.push(c + suits[s]);
 			}
 		}
-		// console.log(newDeck);
 		return newDeck;	
 	}
 
 	function shuffleDeck(aDeckToBeShuffled){
-		// Loop. A lot. Like those machines in casinos.
-		// Each time through the loop, we will switch 2 indices (cards).
-		// When the loop (lots of times) is done, the array (deck)
-		// will be shuffled.
 		for (let i = 0; i < 50000; i++){
 			var rand1 = Math.floor(Math.random() * aDeckToBeShuffled.length);
 			var rand2 = Math.floor(Math.random() * aDeckToBeShuffled.length);
-			// Switch theDeck[rand1] with theDeck[rand2].
-			// Stash the value of theDeck[rand1] inside card1Defender so
-			// we can get back to overwriting theDeck[rand1] with theDeck[rand2].
+		
 			var card1Defender = aDeckToBeShuffled[rand1];
 			aDeckToBeShuffled[rand1] = aDeckToBeShuffled[rand2];
 			aDeckToBeShuffled[rand2] = card1Defender;
 
 		}
-		// console.log(theDeck);
 		return aDeckToBeShuffled;
 	}
 
 	function dealCards(){
-		// let i = 0;
 		while(currentCardIndex < 4){
 			playersHand.push(theDeck[currentCardIndex]);
 			currentCardIndex++;
