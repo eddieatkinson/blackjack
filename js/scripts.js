@@ -142,8 +142,10 @@ $(document).ready(()=>{
 			if(who == 'player' && thisCardsValue == 1){
 				var aceMessage = $('.message');
 				// thisCardsValue = Number(prompt("Ooh. It looks like you got an ace. Would you like it to be 1 or 11 points?"));
-				aceMessage.html(`<form class="ace-value-submit">Oooh. You got an ace! Would you like it to be valued 1 or 11?<input type="text" class="ace-value" 
-					placeholder="Type a 1 or 11" required><input type="submit" value="Make that ace happen!"></form>`);
+				// aceMessage.html(`<form class="ace-value-submit">Oooh. You got an ace! Would you like it to be valued 1 or 11?<div><input type="radio" name="ace" id="ace-value-1" 
+				// 	value="1"><label for="ace-value-1"> &nbsp1</label> &nbsp<input type="radio" name="ace" id="ace-value-11" value="11"/><label for="ace-value-11"> &nbsp11</label></div><div><input type="submit" value="Make that ace happen!"></div></form>`);
+				aceMessage.html(`<form class="ace-value-submit">Oooh. You got an ace! Would you like it to be valued 1 or 11?<input type="text" class="" placeholder="Enter a 1 or 11.">
+					<input type="submit" class="ace-value-submit" value="Make that ace happen!"></form>`);
 				thisCardsValue = aceValueSubmit();
 				
 			}
@@ -170,9 +172,9 @@ $(document).ready(()=>{
 			}else{
 				console.log("Not a proper value...");
 			}
-			
+			return thisCardsValue;
 		})
-		return thisCardsValue;
+		
 	}
 	
 
