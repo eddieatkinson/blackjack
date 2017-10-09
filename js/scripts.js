@@ -1,245 +1,269 @@
 $(document).ready(()=>{
-	var aceValue;
-	var thisCardsValue;
-	var gameStart = true;
-	var gameOn = true;
+
+	const freshDeck = createDeck();
+	var theDeck = [];
 	var playersHand = [];
 	var dealersHand = [];
-	var currentCardIndex = 0;
-	// freshDeck is the return value of the function createDeck()
-	const freshDeck = createDeck();
-	// console.log(freshDeck);
-	// Make a FULL copy of the freshDeck with slice, don't point at it.
-	var theDeck = freshDeck.slice();
-	// shuffleDeck();
+	var wagerTotal = 0;
+	var initialMoney = 100;
+	var doubleDown = true;
+	$('.deal-button').prop('disabled', true); // Make sure you place bet before dealing.
+	$('.hit-button').prop('disabled', true);
+	$('.stand-button').prop('disabled', true);
+	$('.double-down').hide();
+
+	$('.one-dollar').click(()=>{
+		wagerTotal = increaseWager(wagerTotal, 1);
+		canIPlay();
+		console.log(wagerTotal);
+	})
+
+	$('.five-dollar').click(()=>{
+		wagerTotal = increaseWager(wagerTotal, 5);
+		canIPlay();
+		console.log(wagerTotal);
+	})
+
+	$('.ten-dollar').click(()=>{
+		wagerTotal = increaseWager(wagerTotal, 10);
+		canIPlay();
+		console.log(wagerTotal);
+	})
+
+	function canIPlay(){ // Have you met the minimum bet?
+		if(wagerTotal < 5){
+			$('.deal-button').prop('disabled', true);
+			$('.hit-button').prop('disabled', true);
+			$('.stand-button').prop('disabled', true);
+		}else{
+			$('.deal-button').prop('disabled', false);
+		}
+	}
 
 	$('.deal-button').click(()=>{
-		theDeck = freshDeck.slice();
-		theDeck = shuffleDeck(theDeck);
-		playersHand = [];
-		dealersHand = [];
-		$('.card').html('-');
-		// console.log(theDeck);
-		// Update the player and dealer hand arrays...
-		// The player ALWAYS gets the first card in the deck.
-		var topCard = theDeck.shift();
-		playersHand.push(topCard);
+		$('.double-down').show();
 
+		$('.message').html('Welcome to BlackJack! Please place your initial bets, with a minimum bet of 5 dollars. Good luck!');
+
+		$('.hit-button').prop('disabled', false); // To undo when we did 'stand' previously.
+
+		$('.stand-button').prop('disabled', false);
+
+		$('.card').html(''); // Reset the card images.
+
+		playersHand = []; // So we clear out the hand.
+		dealersHand = [];
+
+		var newDeck = freshDeck.slice(); // Slice, so we're not just pointing at it.
+		theDeck = shuffleDeck(newDeck);
+
+		var topCard = theDeck.shift();
+		playersHand.push('5d');
 		placeCard('player', 1, playersHand[0]);
 
-		// var aceValue = aceCheck(topCard);
-		// Give the dealer the next top card...
 		topCard = theDeck.shift();
-		dealersHand.push(topCard);
+		dealersHand.push('10d');
 		placeCard('dealer', 1, dealersHand[0]);
 
 		topCard = theDeck.shift();
-		playersHand.push(topCard);
-
+		playersHand.push('5d');
 		placeCard('player', 2, playersHand[1]);
-		// aceValue = aceCheck(topCard);
 
 		topCard = theDeck.shift();
-		dealersHand.push(topCard);
-		placeCard('dealer', 2, dealersHand[1]);
-
-		// console.log(playersHand);
-		// console.log(dealersHand);
-		// console.log(theDeck);
-
-		// Call placeCard for each of the 4 cards:
-		// arg 1. who
-		// arg 2. where
-		// arg 3. what (card to place in the DOM)
-		
-		
-		
-
-		// Figure the total and put it in the DOM.
-		// arg 1. entire hand
-		// arg 2. who
+		dealersHand.push('7d');
+		$('.dealer-cards .card-2').html('<img src="images/cards/deck.png" />');
 
 		calculateTotal(playersHand, 'player');
 		calculateTotal(dealersHand, 'dealer');
-	})
 
-	$('.hit-button').click(()=>{
-		$('.message').html("");
-		// Get the top card.
-		var topCard = theDeck.shift();
-		// Push it onto the player's hand.
-		playersHand.push(topCard);
-		// Put the card in the DOM.
-		placeCard('player', playersHand.length, topCard);
-		// aceCheck(topCard);
-		// Calculate the new total.
-		calculateTotal(playersHand, 'player');
-	})
-
-	$('.stand-button').click(()=>{
-		// What happens to the player's hand on stand? -- Nothing.
-		// Control passes to the dealer.
-		// Rules for the dealer:
-		// 1. If I have less than 17..., I MUST hit.
-		// 2. If I have 17 or more, I CANNOT hit (even if it means losing)
-		var dealersTotal = calculateTotal(dealersHand, 'dealer');
-		while(dealersTotal < 17){
-			var topCard = theDeck.shift();
-			dealersHand.push(topCard);
-			placeCard('dealer', dealersHand.length, topCard);
-			dealersTotal = calculateTotal(dealersHand, 'dealer');
+		// if(calculateTotal(dealersHand, 'dealer') == 21 && calculateTotal(playersHand, 'player') != 21){
+		// 	$('.message').html("The dealer has BlackJack. You lose!");
+		// 	lostGame();
+		if(calculateTotal(dealersHand, 'dealer') != 21 && calculateTotal(playersHand, 'player') == 21){
+			$('.message').html("BlackJack! You win!");
+			blackJack();
 		}
-		checkWin();
 
+		$('.dealer-total').hide();
+
+	});
+
+	$('.double-down').click(()=>{
+		$('.deal-button').prop('disabled', true);
+		$('.stand-button').prop('disabled', true);
+		$('.message').html("You have chosen to double down. You must take exactly one more card (hit it!).")
+		increaseWager(wagerTotal, wagerTotal);
+		wagerTotal = 2 * wagerTotal;
+		return wagerTotal;
 	})
 
-	// function aceCheck(theTopCard){
-	// 	console.log(theTopCard);
-	// 	console.log(Number(theTopCard.slice[0, -1]));
-	// 	if(theTopCard.slice[0, -1] == "1"){
-	// 		var aceValue = prompt("Oooh. It looks like you got an ace! Would you like that to be a 1 or 11?");
-	// 	}
-	// 	return aceValue;
-	// }
-
-	function checkWin(){
-		var playersTotal = calculateTotal(playersHand, 'player');
-		var dealersTotal = calculateTotal(dealersHand, 'dealer');
-
-		// 1. If the player has > 21, player busts and loses.
-		// 2. If the dealer has > 21, dealer busts and loses.
-		// 3. If playersHand.length == 2 AND playersTotal == 21...BlackJack
-		// 4. If dealerHand.length == 2 AND dealersTotal == 21...BlackJack
-		// 5. If player > dealer, player wins
-		// 6. If dealer > player, dealer wins
-		// 7. else...push (tie)
+	function increaseWager(currentWager, amountToIncrease){
+		currentWager += amountToIncrease;
+		var classSelector = ('.wager-total');
+		$(classSelector).html(currentWager);
+		initialMoney -= amountToIncrease;
+		var classSelector2 = ('.amount-left');
+		$(classSelector2).html(initialMoney);
+		return currentWager;
 	}
 
-	function placeCard(who, where, whatToPlace){
-		var classSelector = `.${who}-cards .card-${where}`;
-		$(classSelector).html(`<img src="images/cards/${whatToPlace}.png" />`);
-		// console.log("1");
-	}
-
-	function calculateTotal(hand, who){
-		// purpose:
-		// 1. Find out the number and return it.
-		// 2. Update the DOM with the right number for the right player.
-		// Initialize counter at 0.
+	function calculateTotal(hand, who){ // hand = the array with cards to total up, who = which section of the DOM to change
 		var handTotal = 0;
-		// As we loop through the hand, we need a var for each card's value.
-		thisCardsValue = 0;
+		var thisCardTotal = 0;
+		var hasAce = false;
+		var totalAces = 0;
 		for(let i = 0; i < hand.length; i++){
-			// Copy onto thisCardsValue the entire sting, except for the last character (-1).
-			// Then, convert it to a number.
-			thisCardsValue = Number(hand[i].slice(0,-1));
-			if(thisCardsValue > 10){
-				thisCardsValue = 10;
+			thisCardTotal = Number(hand[i].slice(0, -1));
+
+			if(thisCardTotal == 1){ // This is an ace.
+				hasAce = true;
+				thisCardTotal = 11;
+				totalAces++; // In case we want to be able to split.
+			}else if(thisCardTotal > 10){ // You have a facecard...reset value to 10.
+				thisCardTotal = 10;
 			}
-			if(who == 'player' && thisCardsValue == 1){
-				var aceMessage = $('.message');
-				// thisCardsValue = Number(prompt("Ooh. It looks like you got an ace. Would you like it to be 1 or 11 points?"));
-				aceMessage.html(`<form class="ace-value-submit">Oooh. You got an ace! Would you like it to be valued 1 or 11?<div><input type="radio" name="ace" id="ace-value-1" 
-					value="1"><label for="ace-value-1"> &nbsp1</label> &nbsp<input type="radio" name="ace" id="ace-value-11" value="11"/><label for="ace-value-11"> &nbsp11</label>
-					<input type="button" value="Get that ace value!" /></div></form>`);
-				// aceMessage.html(`<form class="ace-value-submit">Oooh. You got an ace! Would you like it to be valued 1 or 11?<input type="text" class="" placeholder="Enter a 1 or 11.">
-				// 	<input type="submit" class="ace-value-submit" value="Make that ace happen!"></form>`);
-				// thisCardsValue = aceValueSubmit();
-				// thisCardValue = aceValueSubmit();
-				// console.log(aceValueSubmit());
-				$('input[type="button"]').click(()=>{
-					thisCardsValue = ($('input[name="ace"]:checked').val());
-					// event.preventDefault();
-					console.log(thisCardsValue);
-				})
-				
-			}
-			
-			// if(thisCardsValue == 1){
-			// 	thisCardsValue = valueOfAce;
-			// }
-			console.log(thisCardsValue);
-			handTotal += thisCardsValue;
+
+			handTotal += thisCardTotal;
 		}
+
+		for(let i = 0; i < totalAces; i++){
+			if(handTotal > 21){ // If we have busted but have an ace.
+				handTotal -= 10;
+			}
+		}
+
 		var classSelector = `.${who}-total`;
 		$(classSelector).html(handTotal);
-		// console.log("2");
 		return handTotal;
 	}
 
-	function aceValueSubmit(){
-		$('input[type="submit"]').submit(()=>{
-			thisCardsValue = ($('input[name="ace"]:checked').val());
-			event.preventDefault();
-			// var aceValue = Number($('.message').val());
-			// if(aceValue == 1){
-			// 	thisCardsValue = 1;
-			// }else if(aceValue == 11){
-			// 	thisCardsValue = 11;
-			// }else{
-			// 	console.log("Not a proper value...");
-			// }
-			console.log(thisCardsValue);
-			return thisCardsValue;
-			
-		})
-		// return aceValue;
-		
+	function placeCard(who, where, card){
+		var classSelector = `.${who}-cards .card-${where}`;
+		$(classSelector).html(`<img src="images/cards/${card}.png" />`);
 	}
-	
+
+	$('.hit-button').click(()=>{
+		$('.stand-button').prop('disabled', false);
+		$('.double-down').hide();
+		if(calculateTotal(playersHand, 'player') < 21){
+			var topCard = theDeck.shift();
+			playersHand.push('1d');
+			placeCard('player', playersHand.length, topCard);
+			calculateTotal(playersHand, 'player');
+		}
+		if(calculateTotal(playersHand, 'player') > 21){
+			var classSelector = '.message';
+			$(classSelector).html('You have busted!');
+			lostGame();
+		}
+		if(doubleDown){
+			$('.hit-button').prop('disabled', true);
+			$('.dealer-total').show();
+			$('.hit-button').prop('disabled', true); // Player cannot hit anymore.
+			placeCard('dealer', 2, dealersHand[1]);
+			var dealerTotal = calculateTotal(dealersHand, 'dealer');
+			while(dealerTotal < 17){
+				var topCard = theDeck.shift();
+				dealersHand.push(topCard);
+				placeCard('dealer', dealersHand.length, topCard);
+				dealerTotal = calculateTotal(dealersHand, 'dealer');
+			}
+			checkWin();
+		}
+	});
+
+	$('.stand-button').click(()=>{
+		$('.double-down').hide();
+		$('.dealer-total').show();
+		$('.hit-button').prop('disabled', true); // Player cannot hit anymore.
+		placeCard('dealer', 2, dealersHand[1]);
+		var dealerTotal = calculateTotal(dealersHand, 'dealer');
+		while(dealerTotal < 17){
+			var topCard = theDeck.shift();
+			dealersHand.push(topCard);
+			placeCard('dealer', dealersHand.length, topCard);
+			dealerTotal = calculateTotal(dealersHand, 'dealer');
+		}
+		checkWin();
+	});
 
 	function createDeck(){
 		var newDeck = [];
 		const suits = ['h', 's', 'd', 'c'];
-		for(let s = 0; s < suits.length; s++){ // or suits.map((s)=>{
-			//})
-			for(let c = 1; c <= 13; c++){
+		for(let s = 0; s < suits.length; s++){
+			for(let c = 1; c <= 13; c++){ // Start at 1 because of how we named our images.
 				newDeck.push(c + suits[s]);
 			}
 		}
-		return newDeck;	
+		return newDeck;
 	}
 
-	function shuffleDeck(aDeckToBeShuffled){
-		for (let i = 0; i < 50000; i++){
-			var rand1 = Math.floor(Math.random() * aDeckToBeShuffled.length);
-			var rand2 = Math.floor(Math.random() * aDeckToBeShuffled.length);
-		
-			var card1Defender = aDeckToBeShuffled[rand1];
-			aDeckToBeShuffled[rand1] = aDeckToBeShuffled[rand2];
-			aDeckToBeShuffled[rand2] = card1Defender;
-
+	function shuffleDeck(arrayToBeShuffled){
+		for(let i = 0; i < 50000; i++){
+			var rand1 = Math.floor(Math.random() * arrayToBeShuffled.length);
+			var rand2 = Math.floor(Math.random() * arrayToBeShuffled.length);
+			var saveValueOfCard1 = arrayToBeShuffled[rand1]; // So we don't overwrite it on the next line.
+			arrayToBeShuffled[rand1] = arrayToBeShuffled[rand2];
+			arrayToBeShuffled[rand2] = saveValueOfCard1;
 		}
-		return aDeckToBeShuffled;
+		return arrayToBeShuffled;
 	}
 
-	function dealCards(){
-		while(currentCardIndex < 4){
-			playersHand.push(theDeck[currentCardIndex]);
-			currentCardIndex++;
-			dealersHand.push(theDeck[currentCardIndex]);
-			currentCardIndex++
+	function checkWin(){
+		if(calculateTotal(dealersHand, 'dealer') <= 21){
+			if(calculateTotal(dealersHand, 'dealer') > calculateTotal(playersHand, 'player')){
+				$('.message').html('You have lost!');
+				lostGame();
+			}else if(calculateTotal(dealersHand, 'dealer') == calculateTotal(playersHand, 'player')){
+				$('.message').html('You have tied!');
+				push();
+			}else{
+				$('.message').html('You have won!');
+				winGame();
+			}
+		}else{
+			$('.message').html('You have won!');
+			winGame();
 		}
-		// console.log(playersHand);
-		// console.log(dealersHand);
-	}
-	
-
-	function hitMe(){
-		playersHand.push(theDeck[currentCardIndex]);
-		currentCardIndex++;
-		console.log("Hit me!" + currentCardIndex);
-		dealersHand.push(theDeck[currentCardIndex]);
-		currentCardIndex++;
-		console.log("Hit me dealer" + currentCardIndex);
-		console.log(playersHand);
-		console.log(dealersHand);
 	}
 
+	function split(){
 
+	}
 
+	function lostGame(){
+		wagerTotal = 0;
+		increaseWager(0, 0);
+		$('.deal-button').prop('disabled', true);
+		$('.hit-button').prop('disabled', true);
+		$('.stand-button').prop('disabled', true);
+	}
 
+	function push(){
+		initialMoney += wagerTotal;
+		wagerTotal = 0;
+		increaseWager(0, 0);
+		$('.deal-button').prop('disabled', true);
+		$('.hit-button').prop('disabled', true);
+		$('.stand-button').prop('disabled', true);
+	}
 
+	function winGame(){
+		initialMoney += 2 * wagerTotal;
+		wagerTotal = 0;
+		increaseWager(0, 0);
+		$('.deal-button').prop('disabled', true);
+		$('.hit-button').prop('disabled', true);
+		$('.stand-button').prop('disabled', true);
+	}
 
+	function blackJack(){
+		initialMoney += Math.floor(2.5 * wagerTotal);
+		wagerTotal = 0;
+		increaseWager(0, 0);
+		$('.deal-button').prop('disabled', true);
+		$('.hit-button').prop('disabled', true);
+		$('.stand-button').prop('disabled', true);
+	}
 
-})
+});
