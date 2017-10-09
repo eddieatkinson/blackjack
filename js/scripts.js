@@ -1,10 +1,6 @@
 $(document).ready(()=>{
-	// BlackJack deal function
-	// 	Create deck function
-	// 	Shuffle deck function
-	// 	Add card[0] and card[2] to player hand, 1 and 3 to dealer
-	// 	Place card function
-	// 	Push card onto player's array
+	var aceValue;
+	var thisCardsValue;
 	var gameStart = true;
 	var gameOn = true;
 	var playersHand = [];
@@ -68,6 +64,7 @@ $(document).ready(()=>{
 	})
 
 	$('.hit-button').click(()=>{
+		$('.message').html("");
 		// Get the top card.
 		var topCard = theDeck.shift();
 		// Push it onto the player's hand.
@@ -131,7 +128,7 @@ $(document).ready(()=>{
 		// Initialize counter at 0.
 		var handTotal = 0;
 		// As we loop through the hand, we need a var for each card's value.
-		var thisCardsValue = 0;
+		thisCardsValue = 0;
 		for(let i = 0; i < hand.length; i++){
 			// Copy onto thisCardsValue the entire sting, except for the last character (-1).
 			// Then, convert it to a number.
@@ -142,17 +139,26 @@ $(document).ready(()=>{
 			if(who == 'player' && thisCardsValue == 1){
 				var aceMessage = $('.message');
 				// thisCardsValue = Number(prompt("Ooh. It looks like you got an ace. Would you like it to be 1 or 11 points?"));
-				// aceMessage.html(`<form class="ace-value-submit">Oooh. You got an ace! Would you like it to be valued 1 or 11?<div><input type="radio" name="ace" id="ace-value-1" 
-				// 	value="1"><label for="ace-value-1"> &nbsp1</label> &nbsp<input type="radio" name="ace" id="ace-value-11" value="11"/><label for="ace-value-11"> &nbsp11</label></div><div><input type="submit" value="Make that ace happen!"></div></form>`);
-				aceMessage.html(`<form class="ace-value-submit">Oooh. You got an ace! Would you like it to be valued 1 or 11?<input type="text" class="" placeholder="Enter a 1 or 11.">
-					<input type="submit" class="ace-value-submit" value="Make that ace happen!"></form>`);
-				thisCardsValue = aceValueSubmit();
+				aceMessage.html(`<form class="ace-value-submit">Oooh. You got an ace! Would you like it to be valued 1 or 11?<div><input type="radio" name="ace" id="ace-value-1" 
+					value="1"><label for="ace-value-1"> &nbsp1</label> &nbsp<input type="radio" name="ace" id="ace-value-11" value="11"/><label for="ace-value-11"> &nbsp11</label>
+					<input type="button" value="Get that ace value!" /></div></form>`);
+				// aceMessage.html(`<form class="ace-value-submit">Oooh. You got an ace! Would you like it to be valued 1 or 11?<input type="text" class="" placeholder="Enter a 1 or 11.">
+				// 	<input type="submit" class="ace-value-submit" value="Make that ace happen!"></form>`);
+				// thisCardsValue = aceValueSubmit();
+				// thisCardValue = aceValueSubmit();
+				// console.log(aceValueSubmit());
+				$('input[type="button"]').click(()=>{
+					thisCardsValue = ($('input[name="ace"]:checked').val());
+					// event.preventDefault();
+					console.log(thisCardsValue);
+				})
 				
 			}
 			
 			// if(thisCardsValue == 1){
 			// 	thisCardsValue = valueOfAce;
 			// }
+			console.log(thisCardsValue);
 			handTotal += thisCardsValue;
 		}
 		var classSelector = `.${who}-total`;
@@ -162,18 +168,22 @@ $(document).ready(()=>{
 	}
 
 	function aceValueSubmit(){
-		$('.ace-value-submit').click((event)=>{
+		$('input[type="submit"]').submit(()=>{
+			thisCardsValue = ($('input[name="ace"]:checked').val());
 			event.preventDefault();
-			var aceValue = Number($('.message').val());
-			if(aceValue == 1){
-				thisCardsValue = 1;
-			}else if(aceValue == 11){
-				thisCardsValue = 11;
-			}else{
-				console.log("Not a proper value...");
-			}
+			// var aceValue = Number($('.message').val());
+			// if(aceValue == 1){
+			// 	thisCardsValue = 1;
+			// }else if(aceValue == 11){
+			// 	thisCardsValue = 11;
+			// }else{
+			// 	console.log("Not a proper value...");
+			// }
+			console.log(thisCardsValue);
 			return thisCardsValue;
+			
 		})
+		// return aceValue;
 		
 	}
 	
