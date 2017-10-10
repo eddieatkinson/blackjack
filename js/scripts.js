@@ -15,7 +15,7 @@ $(document).ready(()=>{
 	$('.hit-button').prop('disabled', true);
 	$('.stand-button').prop('disabled', true);
 	$('.double-down').hide(); // We don't want to see it before the game starts.
-	$('.split').hide();
+	// $('.split').hide();
 	$('.split-message').hide();
 	$('.split-player-cards').hide();
 	$('.split-btn').hide();
@@ -24,19 +24,16 @@ $(document).ready(()=>{
 	$('.one-dollar').click(()=>{
 		wagerTotal = increaseWager(wagerTotal, 1);
 		canIPlay();
-		console.log(wagerTotal);
 	})
 
 	$('.five-dollar').click(()=>{
 		wagerTotal = increaseWager(wagerTotal, 5);
 		canIPlay();
-		console.log(wagerTotal);
 	})
 
 	$('.ten-dollar').click(()=>{
 		wagerTotal = increaseWager(wagerTotal, 10);
 		canIPlay();
-		console.log(wagerTotal);
 	})
 	
 
@@ -46,23 +43,29 @@ $(document).ready(()=>{
 			$('.hit-button').prop('disabled', true);
 			$('.stand-button').prop('disabled', true);
 		}else{
+			$('.the-buttons').show();
+			isSplit = false;
 			$('.deal-button').prop('disabled', false);
 		}
 	}
 
 	$('.deal-button').click(()=>{
+		$('.split-btn').hide(); // So we can't see that from the prvious split game.
+		$('.split-message').hide();
 		$('.double-down').show(); // Now we can double down.
 
-		$('.message').html('Welcome to BlackJack! Please place your initial bets, with a minimum bet of 5 dollars. Good luck!');
+		$('.message').html('');
 
 		$('.hit-button').prop('disabled', false); // To undo when we did 'stand' previously.
 
 		$('.stand-button').prop('disabled', false);
 
 		$('.card').html(''); // Reset the card images.
+		$('.split-card').html('') // Reset if we split the last hand.
 
 		playersHand = []; // So we clear out the hand.
 		dealersHand = [];
+		playersHandSplit = [];
 
 		var newDeck = freshDeck.slice(); // Slice, so we're not just pointing at it.
 		theDeck = shuffleDeck(newDeck);
@@ -98,12 +101,16 @@ $(document).ready(()=>{
 
 		if(playersHand[0].slice(0, -1) == playersHand[1].slice(0, -1)){
 			$('.message').html("You got two of the same card! Click on the split to split them.");
+			$('.split').html('<img src="images/split.png" />');
 			$('.split').show();
 		}
 
 	});
 
 	$('.split').click(()=>{
+		$('.split').hide();
+		$('.split-hit-button1').prop('disabled', false);
+		$('.split-stand-button1').prop('disabled', false);
 		$('.split-player-cards').show();
 		$('.split-message').show();
 		$('.split-btn').show();
@@ -185,15 +192,19 @@ $(document).ready(()=>{
 	$('.hit-button').click(()=>{
 		$('.stand-button').prop('disabled', false);
 		$('.double-down').hide();
+		$('.split').hide();
 		if(calculateTotal(playersHand, 'player') < 21){
 			var topCard = theDeck.shift();
-			playersHand.push('1d');
+			playersHand.push(topCard);
 			placeCard('player', playersHand.length, topCard);
 			calculateTotal(playersHand, 'player');
 		}
 		if(calculateTotal(playersHand, 'player') > 21){
 			var classSelector = '.message';
 			$(classSelector).html('You have busted!');
+			$('.dealer-total').show();
+			placeCard('dealer', 2, dealersHand[1]);
+			var dealerTotal = calculateTotal(dealersHand, 'dealer');
 			lostGame();
 		}
 		if(doubleDown){
@@ -276,8 +287,34 @@ $(document).ready(()=>{
 		calculateTotal(playersHand, 'player');
 		calculateTotal(playersHandSplit, 'split');
 		$('.player-cards .card-2').html("");
-		// console.log(playersHand);
-		// console.log(playersHandSplit);
+	}
+
+	function checkSplitWin(){
+		// if(lostFirstHand && lostSecondHand){
+		// 	$('.message').html('You have lost!');
+		// }
+		if(calculateTotal(dealersHand, 'dealer') <= 21){
+			if(calculateTotal(dealersHand, 'dealer') > calculateTotal(playersHand, 'player')){
+				$('.message').html('You lost your first hand.');
+				// lostGame();
+			}else if(calculateTotal(dealersHand, 'dealer') == calculateTotal(playersHand, 'player')){
+				$('.message').html('You have tied your first hand!');
+				// push();
+			}else{
+				$('.message').html('You won your first hand!');
+				// winGame();
+			}
+			if(calculateTotal(dealersHand, 'dealer') > calculateTotal(playersHandSplit, 'split')){
+				$('.message').append('<span> You lost your second hand.</span>');
+			}else if(calculateTotal(dealersHand, 'dealer') == calculateTotal(playersHandSplit, 'split')){
+				$('.message').append('<span> You have tied your second hand!</span>');
+			}else{
+				$('.message').html('You won your second hand!');
+			}
+		}else{
+			$('.message').html('You have won!');
+			winGame();
+		}
 	}
 
 	$('.split-hit-button1').click(()=>{
@@ -319,20 +356,24 @@ $(document).ready(()=>{
 
 	$('.split-hit-button2').click(()=>{
 		isSplit = true;
-		// $('.stand-button').prop('disabled', false);
-		// $('.double-down').hide();
 		if(calculateTotal(playersHandSplit, 'split') < 21){
 			var topCard = theDeck.shift();
 			playersHandSplit.push(topCard);
 			placeCard('player', playersHandSplit.length, topCard);
+			console.log(playersHandSplit);
 			calculateTotal(playersHandSplit, 'split');
 		}
-		if(calculateTotal(playersHand, 'split') > 21){
+		if(calculateTotal(playersHandSplit, 'split') > 21){
 			var classSelector = '.message';
 			$(classSelector).html('You have busted with your second hand.');
 			// lostGame();
 			lostSecondHand = true;
-			checkWin();
+			if(lostFirstHand){ // Lost both hands...
+				$(classSelector).html('You have lost the game.');
+				dealAfterSplit();
+				lostGame();
+			}
+			// checkWin();
 		}
 		if(doubleDown){
 			$('.hit-button').prop('disabled', true);
@@ -351,7 +392,7 @@ $(document).ready(()=>{
 	});
 
 	$('.split-stand-button1').click(()=>{
-		isSplit = false;
+		// isSplit = false;
 		$('.double-down').hide();
 		// $('.dealer-total').show();
 		$('.split-hit-button1').prop('disabled', true); // Player cannot hit anymore.
@@ -419,4 +460,11 @@ $(document).ready(()=>{
 		$('.stand-button').prop('disabled', true);
 	}
 
+	function dealAfterSplit(){
+		isSplit = false;
+		$('.the-buttons').show();
+
+		$('.split-hit-button1').prop('disabled', false); // Make sure we can use these next game, if needed.
+		$('.split-stand-button1').prop('disabled', false);
+	}
 });
