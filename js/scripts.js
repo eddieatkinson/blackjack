@@ -7,8 +7,10 @@ $(document).ready(()=>{
 	var dealersHand = [];
 	var wagerTotal = 0;
 	var initialMoney = 100;
-	var doubleDown = true;
+	var doubleDown = false;
 	var isSplit = false;
+	var lostFirstHand = false;
+	var lostSecondHand = false;
 	$('.deal-button').prop('disabled', true); // Make sure you place bet before dealing.
 	$('.hit-button').prop('disabled', true);
 	$('.stand-button').prop('disabled', true);
@@ -78,7 +80,7 @@ $(document).ready(()=>{
 		placeCard('player', 2, playersHand[1]);
 
 		topCard = theDeck.shift();
-		dealersHand.push('7d');
+		dealersHand.push('6d');
 		$('.dealer-cards .card-2').html('<img src="images/cards/deck.png" />');
 
 		calculateTotal(playersHand, 'player');
@@ -106,6 +108,8 @@ $(document).ready(()=>{
 		$('.split-message').show();
 		$('.split-btn').show();
 		$('.the-buttons').hide();
+		$('.split-hit-button2').prop('disabled', true);
+		$('.split-stand-button2').prop('disabled', true);
 		isSplit = true;
 		increaseWager(wagerTotal, wagerTotal);
 		wagerTotal = 2 * wagerTotal;
@@ -113,6 +117,7 @@ $(document).ready(()=>{
 	})
 
 	$('.double-down').click(()=>{ // If we click on it...
+		doubleDown = true;
 		$('.deal-button').prop('disabled', true); // No more dealing
 		$('.stand-button').prop('disabled', true); // We must take another card
 		$('.message').html("You have chosen to double down. You must take exactly one more card (hit it!).")
@@ -245,6 +250,9 @@ $(document).ready(()=>{
 	}
 
 	function checkWin(){
+		// if(lostFirstHand && lostSecondHand){
+		// 	$('.message').html('You have lost!');
+		// }
 		if(calculateTotal(dealersHand, 'dealer') <= 21){
 			if(calculateTotal(dealersHand, 'dealer') > calculateTotal(playersHand, 'player')){
 				$('.message').html('You have lost!');
@@ -265,6 +273,8 @@ $(document).ready(()=>{
 	function split(){
 		placeCard('player', 1, playersHand[1]);
 		playersHandSplit.push(playersHand.shift());
+		calculateTotal(playersHand, 'player');
+		calculateTotal(playersHandSplit, 'split');
 		$('.player-cards .card-2').html("");
 		// console.log(playersHand);
 		// console.log(playersHandSplit);
@@ -282,8 +292,14 @@ $(document).ready(()=>{
 		}
 		if(calculateTotal(playersHand, 'player') > 21){
 			var classSelector = '.message';
-			$(classSelector).html('You have busted!');
-			lostGame();
+			$(classSelector).html('You have busted with your first hand!');
+			lostFirstHand = true;
+			// lostGame();
+			$('.split-hit-button1').prop('disabled', true);
+			$('.split-stand-button1').prop('disabled', true);
+			$('.split-hit-button2').prop('disabled', false);
+			$('.split-stand-button2').prop('disabled', false);
+
 		}
 		if(doubleDown){
 			$('.hit-button').prop('disabled', true);
@@ -313,8 +329,10 @@ $(document).ready(()=>{
 		}
 		if(calculateTotal(playersHand, 'split') > 21){
 			var classSelector = '.message';
-			$(classSelector).html('You have busted!');
-			lostGame();
+			$(classSelector).html('You have busted with your second hand.');
+			// lostGame();
+			lostSecondHand = true;
+			checkWin();
 		}
 		if(doubleDown){
 			$('.hit-button').prop('disabled', true);
@@ -330,6 +348,40 @@ $(document).ready(()=>{
 			}
 			checkWin();
 		}
+	});
+
+	$('.split-stand-button1').click(()=>{
+		isSplit = false;
+		$('.double-down').hide();
+		// $('.dealer-total').show();
+		$('.split-hit-button1').prop('disabled', true); // Player cannot hit anymore.
+		$('.split-stand-button1').prop('disabled', true);
+		$('.split-hit-button2').prop('disabled', false);
+		$('.split-stand-button2').prop('disabled', false);
+		// placeCard('dealer', 2, dealersHand[1]);
+		// var dealerTotal = calculateTotal(dealersHand, 'dealer');
+		// while(dealerTotal < 17){
+		// 	var topCard = theDeck.shift();
+		// 	dealersHand.push(topCard);
+		// 	placeCard('dealer', dealersHand.length, topCard);
+		// 	dealerTotal = calculateTotal(dealersHand, 'dealer');
+		// }
+		// checkWin();
+	});
+
+	$('.split-stand-button2').click(()=>{
+		$('.double-down').hide();
+		$('.dealer-total').show();
+		$('.split-hit-button2').prop('disabled', true); // Player cannot hit anymore.
+		placeCard('dealer', 2, dealersHand[1]);
+		var dealerTotal = calculateTotal(dealersHand, 'dealer');
+		while(dealerTotal < 17){
+			var topCard = theDeck.shift();
+			dealersHand.push(topCard);
+			placeCard('dealer', dealersHand.length, topCard);
+			dealerTotal = calculateTotal(dealersHand, 'dealer');
+		}
+		checkWin();
 	});
 
 	function lostGame(){
