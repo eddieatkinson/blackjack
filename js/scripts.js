@@ -9,8 +9,6 @@ $(document).ready(()=>{
 	var initialMoney = 100;
 	var doubleDown = false;
 	var isSplit = false;
-	// var bustFirstHand = false;
-	// var bustSecondHand = false;
 	var wonFirstHand = true;
 	var wonSecondHand = true;
 	var pushFirstHand = true;
@@ -19,7 +17,6 @@ $(document).ready(()=>{
 	$('.hit-button').prop('disabled', true);
 	$('.stand-button').prop('disabled', true);
 	$('.double-down').hide(); // We don't want to see it before the game starts.
-	// $('.split').hide();
 	$('.split-message').hide();
 	$('.split-player-cards').hide();
 	$('.split-btn').hide();
@@ -93,9 +90,6 @@ $(document).ready(()=>{
 		calculateTotal(playersHand, 'player');
 		calculateTotal(dealersHand, 'dealer');
 
-		// if(calculateTotal(dealersHand, 'dealer') == 21 && calculateTotal(playersHand, 'player') != 21){
-		// 	$('.message').html("The dealer has BlackJack. You lose!");
-		// 	lostGame();
 		if(calculateTotal(dealersHand, 'dealer') != 21 && calculateTotal(playersHand, 'player') == 21){
 			$('.message').html("BlackJack! You win!");
 			blackJack();
@@ -293,23 +287,17 @@ $(document).ready(()=>{
 	function checkSplitWin(){
 		if(calculateTotal(dealersHand, 'dealer') <= 21){
 			if(calculateTotal(dealersHand, 'dealer') > calculateTotal(playersHand, 'player')){
-				$('.message').html('You lost your first hand.');
 				wonFirstHand = false;
 			}else if(calculateTotal(dealersHand, 'dealer') == calculateTotal(playersHand, 'player')){
-				$('.message').html('You have tied your first hand!');
 				pushFirstHand = true;
 			}else if(calculateTotal(dealersHand, 'dealer') < calculateTotal(playersHand, 'player')){
-				$('.message').html('You won your first hand!');
 				wonFirstHand = true;
 			}
 			if(calculateTotal(dealersHand, 'dealer') > calculateTotal(playersHandSplit, 'split')){
-				$('.message').append('<span> You lost your second hand.</span>');
 				wonSecondHand = false;
 			}else if(calculateTotal(dealersHand, 'dealer') == calculateTotal(playersHandSplit, 'split')){
-				$('.message').append('<span> You have tied your second hand!</span>');
 				pushSecondHand = true;
 			}else if(calculateTotal(dealersHand, 'dealer') < calculateTotal(playersHandSplit, 'split')){
-				$('.message').append('<span> You won your second hand!</span>');
 				wonSecondHand = true;
 			}
 		}else{
@@ -317,34 +305,28 @@ $(document).ready(()=>{
 			wonSecondHand = true;
 		}
 		if(wonFirstHand && wonSecondHand){
-			console.log("Won both!");
+			$('.message').html('You won both of your hands!');
 			winGame();
 		}else if(!wonFirstHand && !wonSecondHand){
-			console.log("Lost both!");
+			$('.message').html('You lost both of your hands!');
 			lostGame();
 		}else if((pushFirstHand && !wonSecondHand) || (!wonFirstHand && pushSecondHand)){
-			console.log("Lost one, pushed one!");
+			$('.message').html('You lost one hand and tied the other!');
 			losePush();
 		}else if((wonFirstHand && !wonSecondHand) || (!wonFirstHand && wonSecondHand)){
-			console.log("Lost one, won one!");
+			$('.message').html('You won one of your hands, but tragically lost the other!');
 			push();
 		}else if(pushFirstHand && pushSecondHand){
-			console.log("Pushed both!");
+			$('.message').html('You tied both of your hands!');
 			push();
 		}else if((pushFirstHand && wonSecondHand) || (wonFirstHand && pushSecondHand)){
-			console.log("Pushed one, won one!");
+			$('.message').html('You won one of your hands, and tied the other!');
 			winPush();
 		}
-		// else{
-		// 	$('.message').html('You have won!');
-		// 	winGame();
-		// }
 	}
 
 	$('.split-hit-button1').click(()=>{
 		isSplit = false;
-		// $('.stand-button').prop('disabled', false);
-		// $('.double-down').hide();
 		if(calculateTotal(playersHand, 'player') < 21){
 			var topCard = theDeck.shift();
 			playersHand.push(topCard);
@@ -395,6 +377,8 @@ $(document).ready(()=>{
 				$(classSelector).html('You have lost the game.');
 				dealAfterSplit();
 				lostGame();
+			}else{
+				checkSplitWin();
 			}
 		}
 		if(doubleDown){
@@ -422,6 +406,7 @@ $(document).ready(()=>{
 	});
 
 	$('.split-stand-button2').click(()=>{
+		isSplit = false;
 		$('.double-down').hide();
 		$('.dealer-total').show();
 		$('.split-hit-button2').prop('disabled', true); // Player cannot hit anymore.
