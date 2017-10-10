@@ -9,8 +9,12 @@ $(document).ready(()=>{
 	var initialMoney = 100;
 	var doubleDown = false;
 	var isSplit = false;
-	var lostFirstHand = false;
-	var lostSecondHand = false;
+	// var bustFirstHand = false;
+	// var bustSecondHand = false;
+	var wonFirstHand = true;
+	var wonSecondHand = true;
+	var pushFirstHand = true;
+	var pushSecondHand = true;
 	$('.deal-button').prop('disabled', true); // Make sure you place bet before dealing.
 	$('.hit-button').prop('disabled', true);
 	$('.stand-button').prop('disabled', true);
@@ -261,9 +265,6 @@ $(document).ready(()=>{
 	}
 
 	function checkWin(){
-		// if(lostFirstHand && lostSecondHand){
-		// 	$('.message').html('You have lost!');
-		// }
 		if(calculateTotal(dealersHand, 'dealer') <= 21){
 			if(calculateTotal(dealersHand, 'dealer') > calculateTotal(playersHand, 'player')){
 				$('.message').html('You have lost!');
@@ -290,31 +291,54 @@ $(document).ready(()=>{
 	}
 
 	function checkSplitWin(){
-		// if(lostFirstHand && lostSecondHand){
-		// 	$('.message').html('You have lost!');
-		// }
 		if(calculateTotal(dealersHand, 'dealer') <= 21){
 			if(calculateTotal(dealersHand, 'dealer') > calculateTotal(playersHand, 'player')){
 				$('.message').html('You lost your first hand.');
-				// lostGame();
+				wonFirstHand = false;
 			}else if(calculateTotal(dealersHand, 'dealer') == calculateTotal(playersHand, 'player')){
 				$('.message').html('You have tied your first hand!');
-				// push();
-			}else{
+				pushFirstHand = true;
+			}else if(calculateTotal(dealersHand, 'dealer') < calculateTotal(playersHand, 'player')){
 				$('.message').html('You won your first hand!');
-				// winGame();
+				wonFirstHand = true;
 			}
 			if(calculateTotal(dealersHand, 'dealer') > calculateTotal(playersHandSplit, 'split')){
 				$('.message').append('<span> You lost your second hand.</span>');
+				wonSecondHand = false;
 			}else if(calculateTotal(dealersHand, 'dealer') == calculateTotal(playersHandSplit, 'split')){
 				$('.message').append('<span> You have tied your second hand!</span>');
-			}else{
-				$('.message').html('You won your second hand!');
+				pushSecondHand = true;
+			}else if(calculateTotal(dealersHand, 'dealer') < calculateTotal(playersHandSplit, 'split')){
+				$('.message').append('<span> You won your second hand!</span>');
+				wonSecondHand = true;
 			}
 		}else{
-			$('.message').html('You have won!');
-			winGame();
+			$('message').html("The dealer busted!");
+			wonSecondHand = true;
 		}
+		if(wonFirstHand && wonSecondHand){
+			console.log("Won both!");
+			winGame();
+		}else if(!wonFirstHand && !wonSecondHand){
+			console.log("Lost both!");
+			lostGame();
+		}else if((pushFirstHand && !wonSecondHand) || (!wonFirstHand && pushSecondHand)){
+			console.log("Lost one, pushed one!");
+			losePush();
+		}else if((wonFirstHand && !wonSecondHand) || (!wonFirstHand && wonSecondHand)){
+			console.log("Lost one, won one!");
+			push();
+		}else if(pushFirstHand && pushSecondHand){
+			console.log("Pushed both!");
+			push();
+		}else if((pushFirstHand && wonSecondHand) || (wonFirstHand && pushSecondHand)){
+			console.log("Pushed one, won one!");
+			winPush();
+		}
+		// else{
+		// 	$('.message').html('You have won!');
+		// 	winGame();
+		// }
 	}
 
 	$('.split-hit-button1').click(()=>{
@@ -330,7 +354,7 @@ $(document).ready(()=>{
 		if(calculateTotal(playersHand, 'player') > 21){
 			var classSelector = '.message';
 			$(classSelector).html('You have busted with your first hand!');
-			lostFirstHand = true;
+			wonFirstHand = false;
 			// lostGame();
 			$('.split-hit-button1').prop('disabled', true);
 			$('.split-stand-button1').prop('disabled', true);
@@ -366,14 +390,12 @@ $(document).ready(()=>{
 		if(calculateTotal(playersHandSplit, 'split') > 21){
 			var classSelector = '.message';
 			$(classSelector).html('You have busted with your second hand.');
-			// lostGame();
-			lostSecondHand = true;
-			if(lostFirstHand){ // Lost both hands...
+			wonSecondHand = false;
+			if(!wonFirstHand){ // Lost both hands...
 				$(classSelector).html('You have lost the game.');
 				dealAfterSplit();
 				lostGame();
 			}
-			// checkWin();
 		}
 		if(doubleDown){
 			$('.hit-button').prop('disabled', true);
@@ -392,22 +414,11 @@ $(document).ready(()=>{
 	});
 
 	$('.split-stand-button1').click(()=>{
-		// isSplit = false;
 		$('.double-down').hide();
-		// $('.dealer-total').show();
 		$('.split-hit-button1').prop('disabled', true); // Player cannot hit anymore.
 		$('.split-stand-button1').prop('disabled', true);
 		$('.split-hit-button2').prop('disabled', false);
 		$('.split-stand-button2').prop('disabled', false);
-		// placeCard('dealer', 2, dealersHand[1]);
-		// var dealerTotal = calculateTotal(dealersHand, 'dealer');
-		// while(dealerTotal < 17){
-		// 	var topCard = theDeck.shift();
-		// 	dealersHand.push(topCard);
-		// 	placeCard('dealer', dealersHand.length, topCard);
-		// 	dealerTotal = calculateTotal(dealersHand, 'dealer');
-		// }
-		// checkWin();
 	});
 
 	$('.split-stand-button2').click(()=>{
@@ -422,7 +433,7 @@ $(document).ready(()=>{
 			placeCard('dealer', dealersHand.length, topCard);
 			dealerTotal = calculateTotal(dealersHand, 'dealer');
 		}
-		checkWin();
+		checkSplitWin();
 	});
 
 	function lostGame(){
@@ -444,6 +455,24 @@ $(document).ready(()=>{
 
 	function winGame(){
 		initialMoney += 2 * wagerTotal;
+		wagerTotal = 0;
+		increaseWager(0, 0);
+		$('.deal-button').prop('disabled', true);
+		$('.hit-button').prop('disabled', true);
+		$('.stand-button').prop('disabled', true);
+	}
+
+	function winPush(){
+		initialMoney += (3/2) * wagerTotal;
+		wagerTotal = 0;
+		increaseWager(0, 0);
+		$('.deal-button').prop('disabled', true);
+		$('.hit-button').prop('disabled', true);
+		$('.stand-button').prop('disabled', true);
+	}
+
+	function losePush(){
+		initialMoney += (1/2) * wagerTotal;
 		wagerTotal = 0;
 		increaseWager(0, 0);
 		$('.deal-button').prop('disabled', true);
