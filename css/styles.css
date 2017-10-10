@@ -8,6 +8,11 @@
 
 .message-row{
 	margin-bottom: 25px;
+	height: 65px;
+}
+
+.message{
+	color: #DCDCDC;
 }
 
 .card{
@@ -19,7 +24,31 @@
 	/*padding: 20px 0px;*/
 }
 
+.player-cards{
+	position: relative;
+}
+
+.split-player-cards{
+	position: absolute;
+	top: 40px;
+}
+
+.split-card{
+	height: 120px;
+	border-left: 15px solid #277714;
+	border-right: 15px solid #277714;
+	background-color: none;
+	text-align: center;
+	/*padding: 20px 0px;*/
+}
+
 .card img{
+	max-width: 100%;
+	max-height: 100%;
+	margin: auto;
+}
+
+.split-card img{
 	max-width: 100%;
 	max-height: 100%;
 	margin: auto;
@@ -48,5 +77,9 @@
 }
 
 .double-down img{
+	max-width: 80px;
+}
+
+.split img{
 	max-width: 80px;
 }
