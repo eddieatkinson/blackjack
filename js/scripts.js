@@ -288,17 +288,23 @@ $(document).ready(()=>{
 		if(calculateTotal(dealersHand, 'dealer') <= 21){
 			if(calculateTotal(dealersHand, 'dealer') > calculateTotal(playersHand, 'player')){
 				wonFirstHand = false;
+				pushFirstHand = false;
 			}else if(calculateTotal(dealersHand, 'dealer') == calculateTotal(playersHand, 'player')){
 				pushFirstHand = true;
+				wonFirstHand = false;
 			}else if(calculateTotal(dealersHand, 'dealer') < calculateTotal(playersHand, 'player')){
 				wonFirstHand = true;
+				pushFirstHand = false;
 			}
 			if(calculateTotal(dealersHand, 'dealer') > calculateTotal(playersHandSplit, 'split')){
 				wonSecondHand = false;
+				pushSecondHand = false;
 			}else if(calculateTotal(dealersHand, 'dealer') == calculateTotal(playersHandSplit, 'split')){
 				pushSecondHand = true;
+				wonSecondHand = false;
 			}else if(calculateTotal(dealersHand, 'dealer') < calculateTotal(playersHandSplit, 'split')){
 				wonSecondHand = true;
+				pushSecondHand = false;
 			}
 		}else{
 			$('message').html("The dealer busted!");
@@ -356,7 +362,7 @@ $(document).ready(()=>{
 				placeCard('dealer', dealersHand.length, topCard);
 				dealerTotal = calculateTotal(dealersHand, 'dealer');
 			}
-			checkWin();
+			checkSplitWin();
 		}
 	});
 
@@ -393,7 +399,7 @@ $(document).ready(()=>{
 				placeCard('dealer', dealersHand.length, topCard);
 				dealerTotal = calculateTotal(dealersHand, 'dealer');
 			}
-			checkWin();
+			checkSplitWin();
 		}
 	});
 
