@@ -1,9 +1,27 @@
+.ocean{
+	position: relative;
+}
+
+.ocean-pic{
+	position: absolute;
+	width: 100vw;
+	height: 100vh;
+}
+
+.sandbox{
+	perspective: 500px;
+	position: relative;
+}
+
 .the-table{
+	position: absolute;
 	background-color: #277714;
 	border: 5px solid #DCDCDC;
 	border-radius: 10px;
-	margin-top: 50px;
+	margin: 50px auto 0 auto;
 	padding: 30px 0px;
+	max-width: 80vw;
+	transform-style: preserve-3d;
 }
 
 .message-row{

@@ -1,5 +1,7 @@
 $(document).ready(()=>{
-
+	$(function () {
+		$('[data-toggle="tooltip"]').tooltip()
+	})
 	const freshDeck = createDeck();
 	var theDeck = [];
 	var playersHand = [];
