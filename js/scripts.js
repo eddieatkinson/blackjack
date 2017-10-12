@@ -25,7 +25,7 @@ $(document).ready(()=>{
 	$('.split-player-cards').hide();
 	$('.split-btn').hide();
 	
-
+// --------------------BET--------------------
 	$('.one-dollar').click(()=>{
 		wagerTotal = increaseWager(wagerTotal, 1);
 		canIPlay();
@@ -43,7 +43,7 @@ $(document).ready(()=>{
 	
 
 	function canIPlay(){ // Have you met the minimum bet?
-		if(wagerTotal < 5 || initialMoney <=0){
+		if(wagerTotal < 5 || initialMoney < 0){
 			$('.deal-button').prop('disabled', true);
 			$('.hit-button').prop('disabled', true);
 			$('.stand-button').prop('disabled', true);
@@ -55,6 +55,7 @@ $(document).ready(()=>{
 	}
 
 	$('.deal-button').click(()=>{
+		$('.money').show();
 		$('.deal-button').prop('disabled', true);
 		$('.split-btn').hide(); // So we can't see that from the prvious split game.
 		$('.split-message').hide();
@@ -97,6 +98,9 @@ $(document).ready(()=>{
 
 		if(calculateTotal(dealersHand, 'dealer') != 21 && calculateTotal(playersHand, 'player') == 21){
 			$('.message').html("BlackJack! You win!");
+			$('.dealer-total').show();
+			placeCard('dealer', 2, dealersHand[1]);
+			var dealerTotal = calculateTotal(dealersHand, 'dealer');
 			blackJack();
 		}
 
@@ -127,27 +131,30 @@ $(document).ready(()=>{
 	})
 
 	$('.double-down').click(()=>{ // If we click on it...
-		doubleDown = true;
-		$('.deal-button').prop('disabled', true); // No more dealing
-		$('.stand-button').prop('disabled', true); // We must take another card
-		$('.message').html("You have chosen to double down. You must take exactly one more card (hit it!).")
-		increaseWager(wagerTotal, wagerTotal);
-		wagerTotal = 2 * wagerTotal;
-		return wagerTotal;
+		if(initialMoney - (2 * wagerTotal) >= 0){
+			doubleDown = true;
+			$('.deal-button').prop('disabled', true); // No more dealing
+			$('.stand-button').prop('disabled', true); // We must take another card
+			$('.message').html("You have chosen to double down. You must take exactly one more card (hit it!).")
+			increaseWager(wagerTotal, wagerTotal);
+			wagerTotal = 2 * wagerTotal;
+			return wagerTotal;
+		}else{
+			$('.message').html("You do not have sufficient funds to double down!");
+		}
 	})
 
 	function increaseWager(currentWager, amountToIncrease){
-		currentWager += amountToIncrease;
-		var classSelector = ('.wager-total');
-		$(classSelector).html(currentWager);
-		initialMoney -= amountToIncrease;
-		var classSelector2 = ('.amount-left');
-		$(classSelector2).html(initialMoney);
-		if(initialMoney <= 0){
-			$('.deal-button').prop('disabled', true);
-			$('.hit-button').prop('disabled', true);
-			$('.stand-button').prop('disabled', true);
+		if(initialMoney - amountToIncrease >= 0){
+			currentWager += amountToIncrease;
+			var classSelector = ('.wager-total');
+			$(classSelector).html(currentWager);
+			initialMoney -= amountToIncrease;
+			var classSelector2 = ('.amount-left');
+			$(classSelector2).html(initialMoney);
+		}else{
 			$('.message').html("You have run out of money!")
+			$('.money').hide();
 		}
 		return currentWager;
 	}
@@ -211,6 +218,7 @@ $(document).ready(()=>{
 			lostGame();
 		}
 		if(doubleDown){
+			doubleDown = false;
 			$('.hit-button').prop('disabled', true);
 			$('.dealer-total').show();
 			$('.hit-button').prop('disabled', true); // Player cannot hit anymore.
@@ -319,45 +327,21 @@ $(document).ready(()=>{
 		}
 		if(wonFirstHand && wonSecondHand){
 			$('.message').html('You won both of your hands!');
-			console.log(wonFirstHand);
-			console.log(pushFirstHand);
-			console.log(wonSecondHand);
-			console.log(pushSecondHand);
 			winGame();
 		}else if(!wonFirstHand && !wonSecondHand){
 			$('.message').html('You lost both of your hands!');
-			console.log(wonFirstHand);
-			console.log(pushFirstHand);
-			console.log(wonSecondHand);
-			console.log(pushSecondHand);
 			lostGame();
 		}else if((pushFirstHand && !wonSecondHand) || (!wonFirstHand && pushSecondHand)){
 			$('.message').html('You lost one hand and tied the other!');
-			console.log(wonFirstHand);
-			console.log(pushFirstHand);
-			console.log(wonSecondHand);
-			console.log(pushSecondHand);
 			losePush();
 		}else if((wonFirstHand && !wonSecondHand) || (!wonFirstHand && wonSecondHand)){
 			$('.message').html('You won one of your hands, but tragically lost the other!');
-			console.log(wonFirstHand);
-			console.log(pushFirstHand);
-			console.log(wonSecondHand);
-			console.log(pushSecondHand);
 			push();
 		}else if(pushFirstHand && pushSecondHand){
 			$('.message').html('You tied both of your hands!');
-			console.log(wonFirstHand);
-			console.log(pushFirstHand);
-			console.log(wonSecondHand);
-			console.log(pushSecondHand);
 			push();
 		}else if((pushFirstHand && wonSecondHand) || (wonFirstHand && pushSecondHand)){
 			$('.message').html('You won one of your hands, and tied the other!');
-			console.log(wonFirstHand);
-			console.log(pushFirstHand);
-			console.log(wonSecondHand);
-			console.log(pushSecondHand);
 			winPush();
 		}
 	}
@@ -465,6 +449,9 @@ $(document).ready(()=>{
 		$('.deal-button').prop('disabled', true);
 		$('.hit-button').prop('disabled', true);
 		$('.stand-button').prop('disabled', true);
+		if(initialMoney <= 0){
+			$('.message').html("You have run out of money!")
+		}
 	}
 
 	function push(){
