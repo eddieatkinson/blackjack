@@ -34,12 +34,12 @@
 
 .sandbox{
 	perspective: 500px;
-	position: relative;
+	position: absolute;
 }
 
 .the-table{
 	/*background-image: url("http://www.sashco.com/wp-content/uploads/2015/05/Wood-prep-types.png");*/
-	position: absolute;
+	position: relative;
 	background-color: #277714;
 	border: 5px solid #DCDCDC;
 	border-radius: 10px;
@@ -48,6 +48,7 @@
 	max-width: 80vw;
 	transform-style: preserve-3d;
 	animation: antitilt 15s infinite;
+	transform: rotateX(45deg);
 }
 
 .message-row{
