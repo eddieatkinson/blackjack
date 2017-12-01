@@ -35,12 +35,21 @@
 .sandbox{
 	perspective: 500px;
 	position: absolute;
+	left: 0;
+	right: 0;
+	margin-left: auto;
+	margin-right: auto;
+	width: 1000px;
 }
 
 .the-table{
 	/*background-image: url("http://www.sashco.com/wp-content/uploads/2015/05/Wood-prep-types.png");*/
-	position: relative;
-	background-color: #277714;
+	background-image: url('https://media.istockphoto.com/photos/timber-wood-brown-oak-panels-used-as-background-picture-id521529428?k=6&m=521529428&s=612x612&w=0&h=d9YhXZhpL3tVyNCBLC6OdCOLgzliK69sLVHeBwhe-qM=');
+	background-size: 100%;
+	background-repeat: no-repeat;
+	/*position: relative;*/
+	/*left: -50%;*/
+	/*background-color: #277714;*/
 	border: 5px solid #DCDCDC;
 	border-radius: 10px;
 	margin: 50px auto 0 auto;
@@ -48,7 +57,7 @@
 	max-width: 80vw;
 	transform-style: preserve-3d;
 	animation: antitilt 15s infinite;
-	transform: rotateX(45deg);
+	/*transform: rotateX(45deg);*/
 }
 
 .message-row{
@@ -61,14 +70,18 @@
 }
 
 .message{
-	color: #DCDCDC;
+	background-color: rgba(255, 255, 255, 0.7);
+	padding: 10px;
+	color: black;
+	border-radius: 5px;
 }
 
 .card{
 	height: 120px;
-	border-left: 15px solid #277714;
-	border-right: 15px solid #277714;
+	/*border-left: 15px solid #277714;*/
+	/*border-right: 15px solid #277714;*/
 	background-color: #D2691E;
+	padding: 10px 0;
 	text-align: center;
 	/*padding: 20px 0px;*/
 }
