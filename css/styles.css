@@ -1,5 +1,5 @@
 @keyframes tilt{
-	0%{transform: rotateZ(.5deg);}*/
+	0%{transform: rotateZ(.5deg);}
 	10%{transform: rotateZ(.1deg);}
 	35%{transform: rotateZ(-.5deg);}
 	45%{transform: rotateZ(.5deg);}
@@ -9,7 +9,7 @@
 	100%{transform: rotateZ(.5deg);}
 }
  @keyframes antitilt{
- 	0%{transform: rotateZ(-.5deg);}*/
+ 	0%{transform: rotateZ(-.5deg);}
 	10%{transform: rotateZ(-.1deg);}
 	35%{transform: rotateZ(.5deg);}
 	45%{transform: rotateZ(-.5deg);}

@@ -207,7 +207,7 @@ and split...
 CSS to make the "raft" sway in the water:
 ``` css
 @keyframes tilt{
-    0%{transform: rotateZ(.5deg);}*/
+    0%{transform: rotateZ(.5deg);}
     10%{transform: rotateZ(.1deg);}
     35%{transform: rotateZ(-.5deg);}
     45%{transform: rotateZ(.5deg);}
@@ -217,7 +217,7 @@ CSS to make the "raft" sway in the water:
     100%{transform: rotateZ(.5deg);}
 }
  @keyframes antitilt{
-    0%{transform: rotateZ(-.5deg);}*/
+    0%{transform: rotateZ(-.5deg);}
     10%{transform: rotateZ(-.1deg);}
     35%{transform: rotateZ(.5deg);}
     45%{transform: rotateZ(-.5deg);}
