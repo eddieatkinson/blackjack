@@ -206,7 +206,7 @@ and split...
 ```
 
 ## Screenshots:
-![Gameplay]()
+![Gameplay](images/BlackjackScreenshot.png)
 
 ## URL:
 [Blackjack 21](http://eddiebatkinson.com/blackjack)
