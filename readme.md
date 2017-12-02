@@ -204,6 +204,29 @@ and split...
         checkSplitWin();
     });
 ```
+CSS to make the "raft" sway in the water:
+``` css
+@keyframes tilt{
+    0%{transform: rotateZ(.5deg);}*/
+    10%{transform: rotateZ(.1deg);}
+    35%{transform: rotateZ(-.5deg);}
+    45%{transform: rotateZ(.5deg);}
+    60%{transform: rotateZ(-.5deg);}
+    75%{transform: rotateZ(.5deg);}
+    90%{transform: rotateZ(-.5deg);}
+    100%{transform: rotateZ(.5deg);}
+}
+ @keyframes antitilt{
+    0%{transform: rotateZ(-.5deg);}*/
+    10%{transform: rotateZ(-.1deg);}
+    35%{transform: rotateZ(.5deg);}
+    45%{transform: rotateZ(-.5deg);}
+    60%{transform: rotateZ(.5deg);}
+    75%{transform: rotateZ(-.5deg);}
+    90%{transform: rotateZ(.5deg);}
+    100%{transform: rotateZ(-.5deg);}
+ }
+```
 
 ## Screenshots:
 ![Gameplay](images/BlackjackScreenshot.png)
