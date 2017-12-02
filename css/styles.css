@@ -97,8 +97,8 @@
 
 .split-card{
 	height: 120px;
-	border-left: 15px solid #277714;
-	border-right: 15px solid #277714;
+	/*border-left: 15px solid #277714;*/
+	/*border-right: 15px solid #277714;*/
 	background-color: none;
 	text-align: center;
 	/*padding: 20px 0px;*/
